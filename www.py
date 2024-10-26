@@ -222,7 +222,7 @@ def randc():
    
 def logo():
     
-    rp(pan(f"""{randc()} 𝗧𝗼𝗼𝗹 𝗧𝘆𝗽𝗲: BOOSTING TOOLS (WITH APPROVAL)
+    rp(pan(f"""{randc()} 𝗧𝗼𝗼𝗹 𝗧𝘆𝗽𝗲: BOOSTING TOOLS (PREMIUM USER)
  𝐓𝐨𝐨𝐥 𝐕𝐞𝐫𝐬𝐢𝐨𝐧: 1.1
  𝗧𝗼𝗼𝗹 𝗢𝘄𝗻𝗲𝗿: Leinathan Añabo Oremor (RFCP)
  𝗡𝗲𝘁𝘄𝗼𝗿𝗸: All Network
