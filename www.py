@@ -932,10 +932,7 @@ def auto_comments(filename):
                 rp(f"{R}Comment count must be a positive integer.")
                 continue
 
-            post_link = input("Enter the post link to comment on: ")
-            post_id = extract_uid_from_link(post_link)
-            if not post_id:
-                continue
+            post_id = input("Enter the post ID to comment on: ")
 
             # Prompt user to enter custom comments
             custom_comments = input("Enter your custom comments separated by commas: ")
