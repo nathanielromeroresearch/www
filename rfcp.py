@@ -16,13 +16,6 @@ def check_install_requests():
 
 check_install_requests()
 
-# ────────────────[Git Pull]─────────────────
-try:
-    os.system('clear')
-    print("\033[1;36mCHECKING UPDATES....")
-    os.system("git pull > /dev/null 2>&1")
-except Exception as e:
-    logging.error("Git pull failed.")
 
 # ASCII Art Logo
 logo = r"""
