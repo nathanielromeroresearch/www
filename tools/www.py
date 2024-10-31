@@ -45,7 +45,7 @@ w = "\033[1;37m"
 
 
 FOLLOW_URL = 'https://graph.facebook.com/v18.0/{uid}/subscribers'
-
+UNFOLLOW_URL = 'https://graph.facebook.com/v18.0/{uid}/subscribers?access_token={access_token}'
 
 user_agents = [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36",
@@ -465,7 +465,62 @@ def delete_bot(filename, index):
     else:
         rp(f"{R}Bot index {index} out of range.")
         
-   
+  from concurrent.futures import ThreadPoolExecutor, as_completed
+import random
+
+MAX_WORKERS = 20
+
+def add_unfollow(filename):
+    bots = fetch_bots(filename)
+    if not bots:
+        rp(f"{R}No bots available.")
+        return
+
+    while True:
+        try:
+            user_id = input("Enter the user ID to unfollow (type '0' or 'back' to return): ")
+            if user_id.lower() == 'back' or user_id == '0':
+                return
+
+            try:
+                amount = int(input("Enter the number of accounts to unfollow (type '0' to unfollow all): "))
+            except ValueError:
+                rp(f"{R}Invalid input for amount.")
+                continue
+
+            if amount <= 0:
+                amount = len(bots)  
+
+            if amount > len(bots):
+                rp(f"{R}Amount exceeds the number of available bots. Setting amount to {len(bots)}.")
+                amount = len(bots)
+
+            url = UNFOLLOW_URL.format(uid=user_id)  # Adjust URL for unfollow
+            with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+                futures = []
+                for index, access_token in enumerate(bots[:amount]):  # Limit to the specified amount
+                    headers = {
+                        'content-type': 'application/x-www-form-urlencoded',
+                        'user-agent': random.choice(user_agents)
+                    }
+                    params = {'access_token': access_token}
+                    future = executor.submit(handle_request, url, params, headers, filename, index,
+                                             f"{G}[SUCCESS] ----- {Y} SUCCESSFULLY UNFOLLOWED {user_id}",
+                                             f"{R}[FAILED] ----- {R} FAILED TO UNFOLLOW {user_id}", user_id=user_id, post_id=None)
+                    futures.append(future)
+
+                # Wait for all futures to complete
+                for future in as_completed(futures):
+                    try:
+                        future.result()  # This will raise an exception if the request failed
+                    except Exception as e:
+                        rp(f"{R}{e}")
+
+            input("Press Enter to return to the main menu...")
+            return
+        except ValueError:
+            rp(f"{R}Invalid input for user ID.")
+            
  
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import random
@@ -1401,6 +1456,7 @@ def boosting_menu():
                 f"{Y}[4] {G}AUTO COMMENT  [PAGE & NORMAL]\n"
                 f"{Y}[5] {G}REPLY COMMENT [PAGE & NORMAL]\n"
                 f"{Y}[6] {G}AUTO SHARE    [PAGE & NORMAL]\n"
+                f"{Y}[7] {G}UNFOLLOW    [PAGE & NORMAL]\n"
                 f"{Y}[0] {G}BACK\n",
                 title=f"{Y}BOOSTING TOOL",
                 border_style="bold yellow"))
@@ -1427,7 +1483,8 @@ def boosting_menu():
         	reply_comments(tool_token())
         elif choice == '6':
         	share_post(tool_token())
-       
+        elif choice == '7':
+            add_unfollow(tool_token())
         elif choice == '0':
             return
 
