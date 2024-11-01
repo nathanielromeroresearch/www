@@ -498,6 +498,17 @@ def handle_request(url, params, headers, filename, index, success_message, error
       
 
 
+def extract_uid_postid(facebook_link):
+    # Adjusted regex to match user ID and post ID from the URL
+    match = re.match(r'https://www\.facebook\.com/([^/]+)/posts/([^/]+)/', facebook_link)
+    if match:
+        uid = match.group(1)  # User ID
+        postid = match.group(2)  # Post ID
+        return uid, postid
+    else:
+        raise ValueError("Invalid Facebook post URL format.")
+
+# Main function to perform reactions
 def perform_reaction(filename, facebook_link, reaction_type, reaction_count, delay):
     try:
         uid, post_id = extract_uid_postid(facebook_link)
