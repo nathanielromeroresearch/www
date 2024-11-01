@@ -1,21 +1,30 @@
 import re
 
-def extract_userid_postid(url):
-    # Define the regex pattern for the new format
-    pattern = r"https://www\.facebook\.com/(\d+)/post/(\d+)"
+def extract_userid_postid(url, link_type):
+    # Define regex patterns for post and video formats
+    if link_type == 'post':
+        pattern = r"https://www\.facebook\.com/(\d+)/post/(\d+)"
+    elif link_type == 'video':
+        pattern = r"https://www\.facebook\.com/(\d+)/video/(\d+)"
+    else:
+        return None
+
     match = re.search(pattern, url)
     
     if match:
         userid = match.group(1)
-        postid = match.group(2)
-        return f"{userid}_{postid}"
+        contentid = match.group(2)
+        return f"{userid}_{contentid}"
     else:
         return None
 
-# Example usage
-url = "https://www.facebook.com/123456789/post/987654321"
-result = extract_userid_postid(url)
+# Prompt the user to choose the type of link
+link_type = input("Enter the type of link (post/video): ").strip().lower()
+url = input("Enter the Facebook link: ")
+
+result = extract_userid_postid(url, link_type)
+
 if result:
-    print(result)  # Output: 123456789_987654321
+    print(f"Extracted: {result}")  # Output: {userid}_{postid or videoid}
 else:
     print("No match found")
