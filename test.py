@@ -499,7 +499,6 @@ def handle_request(url, params, headers, filename, index, success_message, error
 
 
 def extract_uid_postid(facebook_link):
-    # Adjusted regex to match user ID and post ID from the URL
     match = re.match(r'https://www\.facebook\.com/([^/]+)/posts/([^/]+)/', facebook_link)
     if match:
         uid = match.group(1)  # User ID
@@ -507,6 +506,16 @@ def extract_uid_postid(facebook_link):
         return uid, postid
     else:
         raise ValueError("Invalid Facebook post URL format.")
+
+# Function to handle the request to the Facebook API
+def handle_request(url, params, headers):
+    try:
+        response = requests.post(url, data=params, headers=headers)
+        response_json = response.json()
+        return response_json
+    except Exception as e:
+        print(f"Error during request: {e}")
+        return {'success': False, 'error': str(e)}
 
 # Main function to perform reactions
 def perform_reaction(filename, facebook_link, reaction_type, reaction_count, delay):
@@ -523,16 +532,24 @@ def perform_reaction(filename, facebook_link, reaction_type, reaction_count, del
             'user-agent': random.choice(user_agents)
         }
         params = {'access_token': access_token, 'type': reaction_type}
-        handle_request(url, params, headers, filename, i, f"{G}[SUCCESS] ----- {Y} SUCCESSFULLY REACTED ON POST", f"{R}[FAILED] ----- {R} FAILED TO REACT ON POST", user_id=uid, post_id=post_id)
+        
+        response = handle_request(url, params, headers)
+        
+        if response.get('success'):  # Check if the response indicates success
+            print(f"{G}[SUCCESS] ----- {Y} SUCCESSFULLY REACTED ON POST")
+        else:
+            error_message = response.get('error', {}).get('message', 'Unknown error occurred')
+            print(f"{R}[FAILED] ----- {R} FAILED TO REACT ON POST: {error_message}")
+        
         time.sleep(delay)
 
-    bots = fetch_bots(filename)
+    bots = fetch_bots(filename)  # Assumes this function is defined elsewhere
     if not bots:
         print(f"{R}No bots available.")
         return
     random.shuffle(bots)
 
-    reaction_types = display_reaction_types()
+    reaction_types = display_reaction_types()  # Assumes this function is defined elsewhere
     reaction_type = reaction_types.get(reaction_type, 'LIKE')
 
     print(f"{G}Starting reactions with {reaction_type} on post {post_id}...")
@@ -552,6 +569,7 @@ def perform_reaction(filename, facebook_link, reaction_type, reaction_count, del
         for future in futures:
             future.result()  
     print(f"{G}Finished reacting to post {post_id}.")
+
 
 
 def comment_reactions(filename, post_id, reaction_type, reaction_count, delay):
