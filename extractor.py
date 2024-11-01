@@ -3,9 +3,9 @@ import re
 def extract_userid_contentid(url, link_type):
     # Define regex patterns for post and video formats
     if link_type == 'post':
-        pattern = r"https://www\.facebook\.com/(\d+)/post/(\d+)/\?mibex"
+        pattern = r"https://www\.facebook\.com/(\d+)/post/(\d+)/"
     elif link_type == 'video':
-        pattern = r"https://www\.facebook\.com/(\d+)/video/(\d+)/\?mibex"
+        pattern = r"https://www\.facebook\.com/(\d+)/video/(\d+)/"
     else:
         return None
 
